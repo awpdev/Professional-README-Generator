@@ -1,84 +1,102 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
+const validation = require('./validation');
+
+// array of questions to run by inquirer
+const questions = [
+  {
+    type: 'input',
+    name: 'projectName',
+    message: 'Welcome to README generator.\nEnter the name of the project:'
+  },
+  {
+    type: 'input',
+    name: 'description',
+    message: 'Enter a description for the project:'
+  },
+  {
+    type: 'input',
+    name: 'installCmd',
+    message: 'Enter install command if any:'
+  },
+  {
+    type: 'input',
+    name: 'installIns',
+    message: 'Enter additional install instructions if any:'
+  },
+  {
+    type: 'input',
+    name: 'usageCmd',
+    message: 'Enter usage command if any:'
+  },
+  {
+    type: 'input',
+    name: 'usageIns',
+    message: 'Enter additional usage instructions if any:'
+  },
+  {
+    type: 'input',
+    name: 'contributing',
+    message: 'What are the contribution guidelines if any:'
+  },
+  {
+    type: 'input',
+    name: 'testCmd',
+    message: 'Enter test command if any:'
+  },
+  {
+    type: 'input',
+    name: 'testIns',
+    message: 'Enter additional test instructions if any:'
+  },
+  {
+    type: 'list',
+    message: 'Select a license for the project:',
+    name: 'license',
+    choices: [
+      'GNU AGPLv3',
+      'GNU GPLv3',
+      'GNU LGPLv3', 
+      'Mozilla Public License 2.0', 
+      'Apache License 2.0',
+      'MIT License',
+      'Boost Software License 1.0',
+      'The Unlicense'
+    ]
+  },
+  {
+    type: 'input',
+    name: 'username',
+    message: 'Enter your Github username:',
+    validate: function(username) {
+        // Regex username check, returns true if valid username
+        if (!(/^[a-zA-Z0-9\-]+$/).test(username)) {
+          return (`Not a valid username.`);
+        } else return true;
+    }
+  },
+  {
+    type: 'input',
+    name: 'email',
+    message: 'Enter your email address:',
+    validate: function(email) {
+        // Regex email check, returns true if valid email structure
+        if (!(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()\.,;\s@\"]+\.{0,1})+([^<>()\.,;:\s@\"]{2,}|[\d\.]+))$/).test(email)) {
+          return (`Not a valid email address.`);
+        } else return true;
+    }
+  },
+  {
+    type: 'input',
+    name: 'questionIns',
+    message: 'Enter additional contact instructions if any:'
+  }
+];
 
 const promptUser = () =>
-  inquirer.prompt([
-    {
-      type: 'input',
-      name: 'projectName',
-      message: 'Enter the name of the project:'
-    },
-    {
-      type: 'input',
-      name: 'description',
-      message: 'Enter a description for the project:'
-    },
-    {
-      type: 'input',
-      name: 'installCmd',
-      message: 'Enter install command if any:'
-    },
-    {
-      type: 'input',
-      name: 'installIns',
-      message: 'Enter additional install instructions if any:'
-    },
-    {
-      type: 'input',
-      name: 'usageCmd',
-      message: 'Enter usage command if any:'
-    },
-    {
-      type: 'input',
-      name: 'usageIns',
-      message: 'Enter additional usage instructions if any:'
-    },
-    {
-      type: 'input',
-      name: 'contributing',
-      message: 'What are the contribution guidelines if any:'
-    },
-    {
-      type: 'input',
-      name: 'testCmd',
-      message: 'Enter test command if any:'
-    },
-    {
-      type: 'input',
-      name: 'testIns',
-      message: 'Enter additional test instructions if any:'
-    },
-    {
-      type: 'list',
-      message: 'Select a license for the project:',
-      name: 'license',
-      choices: [
-        'GNU AGPLv3',
-        'GNU GPLv3',
-        'GNU LGPLv3', 
-        'Mozilla Public License 2.0', 
-        'Apache License 2.0',
-        'MIT License',
-        'Boost Software License 1.0',
-        'The Unlicense'
-      ]
-    },
-    {
-      type: 'input',
-      name: 'username',
-      message: 'Enter your Github username:'
-    },
-    {
-      type: 'input',
-      name: 'email',
-      message: 'Enter your email address:',
-    },
-    {
-      type: 'input',
-      name: 'questionIns',
-      message: 'Enter additional contact instructions if any:'
-    }
-  ]).then((answers) => {
+  inquirer
+    .prompt(questions)
+    .then((answers) => {
     console.log(answers);
     let markdownString = 
     `# ${answers.projectName} `;
@@ -155,34 +173,16 @@ const promptUser = () =>
         markdownString += `${answers.testIns}\n\n\n`;
       }
     }
-    markdownString += `## Questions\nPlease refer to my [Github profile](https://www.github.com/${answers.username}).\n\n`;
+    markdownString += `## Questions\nPlease refer to my [Github](https://www.github.com/${answers.username}).\n\n`;
     markdownString += `Also contact me via [email](mailto:${answers.email}) with your inquiries.\n\n`;
     if (answers.questionIns) markdownString += `${answers.questionIns}\n\n\n`;
     markdownString += `## License\nThis project is under ${answers.license}.`;
 
-    fs.writeFile("README.md", markdownString, err => {
-      if(err) console.log(err)
+    let fileName = 'README-' + answers.projectName.toLowerCase().split(' ').join('-') + '.md';
+
+    fs.writeFile(fileName +'.md', markdownString, err => {
+      if(err) console.log(err);
+      else console.log(`Markdown file named ${fileName} has been successfully created!`);
     })
   });
 promptUser();
-
-function main() {
-  //
-}
-
-function validateEmail(input) {
-  const mailformat = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-  if (input.value.match(mailformat)) return true;
-  else {
-    alert("You have entered an invalid email address!");
-    return false;
-  }
-};
-
-const usernameValidator = async (input) => {
-  if (input.includes(" ")) {
-     return 'Invalid username';
-  }
-  return true;
-};
-
