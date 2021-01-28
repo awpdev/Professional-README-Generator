@@ -1,6 +1,5 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
-const validation = require('./validation');
 
 // array of questions to run by inquirer
 const questions = [
@@ -97,8 +96,9 @@ const promptUser = () =>
   inquirer
     .prompt(questions)
     .then((answers) => {
-    console.log(answers);
+    // text to insert into md file
     let markdownString = 
+    // project name and license as the header
     `# ${answers.projectName} `;
     switch (answers.license) {
       case 'GNU AGPLv3':
@@ -128,6 +128,7 @@ const promptUser = () =>
         break;
     }
 
+    // description and table of contents
     markdownString += `\n\n## Description\n${answers.description}\n\n\n## Table of Contents\n`;
     if (answers.installCmd || answers.installIns) markdownString += `* [Installation](#installation)\n`;
     if (answers.usageCmd || answers.usageIns) markdownString += `* [Usage](#usage)\n`;
@@ -135,6 +136,7 @@ const promptUser = () =>
     if (answers.testCmd || answers.testIns) markdownString += `* [Tests](#tests)\n`;
     markdownString += `* [Questions](#questions)\n* [License](#license)\n\n\n`;
 
+    // install code block and description if entered by user
     if (answers.installCmd || answers.installIns) {
       markdownString += `## Installation\n`;
       if (answers.installCmd) {
@@ -145,6 +147,7 @@ const promptUser = () =>
       }
       if (answers.installIns) markdownString += `${answers.installIns}\n\n\n`;
     } 
+    // usage code block and description if entered by user
     if (answers.usageCmd || answers.usageIns) {
       markdownString += `## Usage\n`;
       if (answers.usageCmd) {
@@ -157,10 +160,12 @@ const promptUser = () =>
         markdownString += `${answers.usageIns}\n\n\n`;
       }
     }
+    // contributing information if entered by user
     if (answers.contributing) {
       markdownString += `## Contributing\n`;
       markdownString += `${answers.contributing}\n\n\n`;
     }
+    // test code block and description if entered by user
     if (answers.testCmd || answers.testIns) {
       markdownString += `## Tests\n`;
       if (answers.testCmd) {
@@ -173,6 +178,7 @@ const promptUser = () =>
         markdownString += `${answers.testIns}\n\n\n`;
       }
     }
+    // question section and license
     markdownString += `## Questions\nPlease refer to my [Github](https://www.github.com/${answers.username}).\n\n`;
     markdownString += `Also contact me via [email](mailto:${answers.email}) with your inquiries.\n\n`;
     if (answers.questionIns) markdownString += `${answers.questionIns}\n\n\n`;
