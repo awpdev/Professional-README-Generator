@@ -186,7 +186,7 @@ const promptUser = () =>
 
     let fileName = 'README-' + answers.projectName.toLowerCase().split(' ').join('-') + '.md';
 
-    fs.writeFile(fileName +'.md', markdownString, err => {
+    fs.writeFile(fileName, markdownString, err => {
       if(err) console.log(err);
       else console.log(`Markdown file named ${fileName} has been successfully created!`);
     })
